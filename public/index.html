@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediVoice | AI Healthcare Assistant</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-background">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- Emergency Banner Wrapper -->
+        <div id="emergency-banner-wrapper" class="hidden">
+            <div class="emergency-banner">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div class="emergency-text">
+                    <strong>Critical Symptom Detected</strong>
+                    <span>Your symptoms suggest a potentially serious condition. Please seek immediate professional medical attention or call emergency services.</span>
+                    <a href="https://www.google.com/maps/search/?api=1&query=hospitals+near+me" target="_blank" class="emergency-hospital-link"><i class="fa-solid fa-location-dot"></i> Find Nearest Hospital</a>
+                </div>
+                <button class="close-emergency" id="close-emergency-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+
+        <div class="chat-interface">
+            <!-- Sidebar / Info Area -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <i class="fa-solid fa-stethoscope logo-icon"></i>
+                        <h1>MediVoice</h1>
+                    </div>
+                </div>
+                <div class="sidebar-content">
+                    <div class="info-card">
+                        <h3><i class="fa-solid fa-circle-info"></i> Important Notice</h3>
+                        <p>MediVoice provides instant, safe, general medical guidance based on symptoms.</p>
+                        <p class="highlight-warning">We do NOT provide medical diagnosis or prescriptions. Always consult a real doctor for definitive medical advice.</p>
+                    </div>
+                    
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="feature-text">Instant guidance</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fa-solid fa-shield-heart"></i></div>
+                            <div class="feature-text">Private & Secure</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fa-solid fa-bell-concierge"></i></div>
+                            <div class="feature-text">Emergency detection</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+                    <button class="new-chat-btn" id="new-chat-btn">
+                        <i class="fa-solid fa-plus"></i> New Consultation
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Chat Area -->
+            <main class="chat-main">
+                <div class="chat-header">
+                    <div class="doctor-avatar">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="doctor-info">
+                        <h2>Dr. Nova</h2>
+                        <span>AI Assistant</span>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Welcome message -->
+                    <div class="message ai-message">
+                        <div class="message-content">
+                            Hello, I'm Dr. Nova, your MediVoice assistant. Please describe your symptoms in detail, and I'll do my best to guide you. (Remember, I am an AI and cannot replace real medical care).
+                        </div>
+                        <div class="message-time">Now</div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="chat-input-area">
+                    <form id="chat-form" class="input-form">
+                        <textarea id="message-input" rows="1" placeholder="Describe your symptoms here..." required></textarea>
+                        <button type="submit" id="send-btn" class="send-btn" aria-label="Send Message">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                    <div class="disclaimer">
+                        MediVoice can make mistakes. Consider verifying critical information with a healthcare provider.
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
