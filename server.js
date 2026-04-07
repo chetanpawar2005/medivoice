@@ -12,19 +12,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Initialize OpenAI client for OpenRouter
+// Initialize OpenAI client for Gemini
 let openai;
 try {
   openai = new OpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKey: process.env.OPENAI_API_KEY,
-    defaultHeaders: {
-      "HTTP-Referer": "http://localhost:3000",
-      "X-Title": "MediVoice",
-    }
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+    apiKey: process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY,
   });
 } catch (error) {
-  console.warn("OpenAI API key not configured properly.");
+  console.warn("API key not configured properly.");
 }
 
 // Emergency keywords
@@ -57,18 +53,9 @@ app.post('/api/chat', async (req, res) => {
   try {
     const { message, history } = req.body;
 
-    if (!message || message.trim() === '') {
-      return res.status(400).json({ error: 'Message cannot be empty.' });
-    }
-
-    if (message.length > 500) {
-      return res.status(400).json({ error: 'Message is too long. Please keep it under 500 characters.' });
-    }
-
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ 
-        error: 'OpenAI API key is missing. Please configure it in the .env file.' 
-      });
+    let demoMode = false;
+    if (!process.env.GEMINI_API_KEY && (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.startsWith('sk-or-'))) {
+      demoMode = true;
     }
 
     const isEmergency = checkEmergency(message);
@@ -86,14 +73,26 @@ app.post('/api/chat', async (req, res) => {
 
     messages.push({ role: 'user', content: message });
 
-    const completion = await openai.chat.completions.create({
-      model: "openai/gpt-3.5-turbo", // Guarantee a valid OpenRouter model
-      messages: messages,
-      temperature: 0.5,
-      max_tokens: 300,
-    });
+    let aiResponse = "";
 
-    const aiResponse = completion.choices[0].message.content;
+    if (demoMode) {
+      // Create a smart mock response so the UI still functions perfectly
+      await new Promise(resolve => setTimeout(resolve, 1500)); // fake typing delay
+      
+      if (isEmergency) {
+        aiResponse = "I am currently in **Demo Mode** because a valid API Key is missing. However, based on your keywords, this sounds like a serious medical emergency! Please seek immediate attention. \n\n[SPECIALTY: Hospital]";
+      } else {
+        aiResponse = "I am currently in **Demo Mode** because a valid Gemini API Key is missing from the `.env` file.\n\nIf I were fully connected, I would analyze your symptoms and give you general medical advice. For general checkups, I would recommend visiting a local clinic.\n\n[SPECIALTY: General Physician]";
+      }
+    } else {
+      const completion = await openai.chat.completions.create({
+        model: "gemini-2.5-flash", // Fast and free Gemini model
+        messages: messages,
+        temperature: 0.5,
+        max_tokens: 300,
+      });
+      aiResponse = completion.choices[0].message.content;
+    }
 
     res.json({
       response: aiResponse,
@@ -102,7 +101,18 @@ app.post('/api/chat', async (req, res) => {
 
   } catch (error) {
     console.error('Error generating AI response:', error);
-    res.status(500).json({ error: 'An error occurred while communicating with the AI. Please try again later.' });
+    
+    // In case of a 401 auth error, fail gracefully to Demo Mode
+    if (error.status === 401 || error.message.includes('401')) {
+       res.json({
+         response: "I attempted to contact the AI, but the API key was instantly rejected (Error 401 Unauthorized). Please check your `.env` file and generate a fresh key from https://aistudio.google.com/app/apikey. \n\n[SPECIALTY: General Physician]",
+         isEmergency: false
+       });
+       return;
+    }
+
+    const apiErrorDetail = error.message || 'Unknown provider error';
+    res.status(500).json({ error: `AI Communication Error: ${apiErrorDetail}` });
   }
 });
 

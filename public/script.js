@@ -95,8 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <a href="https://www.google.com/maps/search/?api=1&query=${mapQuery}" target="_blank" class="action-btn doctor-btn">
                     <i class="fa-solid fa-stethoscope"></i> Find nearby ${specialty}
                 </a>
-                <a href="https://www.google.com/maps/search/?api=1&query=${hospitalQuery}" target="_blank" class="action-btn hospital-btn">
-                    <i class="fa-solid fa-truck-medical"></i> Find nearby Hospitals
+                <a href="#" class="action-btn hospital-btn">
+                    <i class="fa-solid fa-phone"></i> Contact Detail
                 </a>
             `;
             contentDiv.appendChild(actionContainer);
