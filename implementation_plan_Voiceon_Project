@@ -1,0 +1,78 @@
+# AI Human Chat Application (Advanced) - Voiceon
+
+Based on the `prd.md`, here is my proposed implementation plan to build out the "Voiceon" project from scratch. It is a full-stack platform with a React frontend, Node/Express backend, MongoDB database, real-time WebSocket communication, Gemini API for AI and emotion detection, and Three.js for 3D avatars.
+
+I will take this step-by-step, focusing on the Web Platform first (Phases 1-5 from the PRD), before eventually considering the React Native mobile app (Phase 6).
+
+## User Review Required
+
+> [!IMPORTANT]
+> - **AI Provider:** The PRD mentions OpenAI or Gemini. Since you're currently using Gemini in this interface, I will assume we are integrating the **Gemini API** on your backend for the AI text generation and Emotion Analysis. Please let me know if you prefer OpenAI.
+> - **3D Avatar:** Building a highly realistic lip-syncing 3D avatar that seamlessly blends with speech from scratch is extremely complex. Initially, I propose using a **free minimal 3D character** via `@react-three/fiber` with simple talking animations. Would you be okay with this initial MVP approach for the avatar?
+> - **Database:** You will need a **MongoDB cluster** (either locally installed or MongoDB Atlas). Let me know if you need help setting it up.
+
+## Proposed Changes
+
+We will divide the project into two main directories: `backend` and `frontend`. 
+
+---
+
+### Backend (Node.js + Express)
+
+We will initialize a Node.js project using Express, MongoDB (Mongoose), Socket.io, and the Gemini API SDK.
+
+#### [NEW] backend/package.json
+- Initialize dependencies (`express`, `mongoose`, `cors`, `dotenv`, `socket.io`, `@google/genai`).
+
+#### [NEW] backend/server.js
+- Main entry point. Set up Express server, apply middleware (CORS, JSON parsing), establish Socket.io server, and connect to MongoDB.
+
+#### [NEW] backend/models/Chat.js
+- Mongoose schema to store conversations, user sessions, messages, and detected emotions (Memory System).
+
+#### [NEW] backend/services/aiService.js
+- Integration with Gemini API. We will instruct the model to return both the response text and the detected user emotion (Happy, Sad, Angry, Neutral).
+
+#### [NEW] backend/sockets/chatSocket.js
+- Handle real-time WebSocket events. Receive text, send it to the `aiService`, stream AI typing status, and emit the final response with the detected emotion.
+
+---
+
+### Frontend (React + Vite + Tailwind + Three.js)
+
+We will initialize a React project using Vite and install Tailwind CSS for styling. For 3D Avatars, we'll use `@react-three/fiber` and `@react-three/drei`.
+
+#### [NEW] frontend/package.json
+- Initialize React app through Vite. Add dependencies like `socket.io-client`, `framer-motion` (for animations), `react-router-dom`, `@react-three/fiber`, and `@react-three/drei`.
+
+#### [NEW] frontend/tailwind.config.js / index.css
+- Base styling setup, ensuring a glossy, vibrant, dynamic aesthetic matching an "Advanced AI" application.
+
+#### [NEW] frontend/src/components/Chat/ChatBox.jsx
+- The main real-time chat interface. Contains message history, typing indicators from Socket.io, and emotion badges on AI responses.
+
+#### [NEW] frontend/src/components/Voice/VoiceControls.jsx
+- Leverage the **Web Speech API** for Speech-to-Text (user speaking to AI) and Text-to-Speech (AI reading out responses).
+
+#### [NEW] frontend/src/components/Avatar/ThreeAvatar.jsx
+- A WebGL space containing our 3D avatar, which reacts to "talking" events or "emotions" pushed via the backend.
+
+#### [NEW] frontend/src/App.jsx
+- Combine the Chat Box, Voice Controls, and 3D Avatar into a unified Dashboard.
+
+## Open Questions
+
+> [!WARNING]
+> 1. Do you have a **MongoDB URI** and a **Gemini API Key** ready for use? I will need to set up a `.env` file for the backend.
+> 2. Have you prepared a any specific `.glb`/`.gltf` 3D model for the avatar, or should I try to use a generic abstract geometric shape or free placeholder model in the Three.js scene for now?
+
+## Verification Plan
+
+### Automated / Backend Tests
+- I'll locally start the node server and make sure basic REST routes and WebSockets connect.
+- Will verify MongoDB connection works.
+- Send mock interactions to the Gemini API layer to verify the emotion detection prompt.
+
+### Manual Verification
+- We'll run the Vite frontend (`npm run dev`) and node backend concurrently.
+- You can manually test real-time chat, see if the AI detects your emotion appropriately (e.g., "I'm so angry today!" -> "Emotion: Angry"), and test the Speech-to-Text / Text-to-Speech capabilities in your browser.
